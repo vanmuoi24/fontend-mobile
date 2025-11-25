@@ -1,0 +1,30 @@
+.marquee-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 70vw;
+  height: 64px; /* cùng chiều cao header */
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 0; /* nằm phía dưới layer khác */
+}
+
+.marquee-text {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 28px;
+  color: #6b46c1;
+  text-shadow: 0 0 8px rgba(107, 70, 193, 0.4);
+  line-height: 64px; /* căn giữa theo chiều cao header */
+  animation: moveAcross 10s linear infinite;
+}
+
+/* Animation chạy từ trái sang phải */
+@keyframes moveAcross {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+}
