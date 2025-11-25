@@ -1,10 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    open: "/admin/users", // 👈 khi chạy npm run dev, tự mở /admin
+  plugins: [
+    react(),
+    viteStaticCopy({
+      targets: [{ src: "public/_redirects", dest: "" }],
+    }),
+  ],
+  build: {
+    outDir: "dist",
   },
 });
