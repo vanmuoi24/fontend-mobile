@@ -203,6 +203,7 @@ const UserManager = () => {
         visible={editModalVisible}
         onCancel={() => setEditModalVisible(false)}
         userData={selectedUser}
+        fectData={fechData}
       />
     </div>
   );

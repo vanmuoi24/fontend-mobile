@@ -8,26 +8,22 @@ import {
   message,
   Space,
   Input,
-  Image,
+  Tag,
 } from "antd";
 import {
   EditOutlined,
   UploadOutlined,
-  PictureOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import { updateUserAvatar, userlist } from "../../../service/UserApi";
 import avtDefault from "../../../assets/avtVssID.png";
-import Dragger from "antd/lib/upload/Dragger";
-// TODO: import API update avatar thật của bạn
-// import { updateUserAvatar } from "../../../service/UserApi";
+import { toast } from "react-toastify";
+
+const { Dragger } = Upload;
 
 const ManagerAvt = () => {
   const [dataUser, setDataUser] = useState([]);
-  const [loading, setLoading] = useState(false);
-
   const [searchText, setSearchText] = useState("");
-
   const [openModal, setOpenModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [file, setFile] = useState(null);
@@ -36,18 +32,10 @@ const ManagerAvt = () => {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
-      const res = await userlist();
-      if (res && res.success === true) {
-        setDataUser(res.data || []);
-      } else {
-        message.error("Lấy danh sách người dùng thất bại");
-      }
-    } catch (error) {
-      console.error(error);
-      message.error("Lỗi khi tải danh sách người dùng");
-    } finally {
-      setLoading(false);
+      let res = await userlist();
+      if (res && res.data) setDataUser(res.data);
+    } catch {
+      message.error("Không thể tải danh sách người dùng");
     }
   };
 
@@ -56,160 +44,130 @@ const ManagerAvt = () => {
   }, []);
 
   const clearPreview = () => {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
   };
 
   const uploadProps = {
     accept: "image/*",
     multiple: false,
-    beforeUpload: (f) => {
+    beforeUpload: (file) => {
       clearPreview();
-      setFile(f);
-      const url = URL.createObjectURL(f);
-      setPreviewUrl(url); // xem ảnh mới trước
-      return false; // không upload auto
+      setFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      return false;
     },
     onRemove: () => {
-      setFile(null);
       clearPreview();
+      setFile(null);
     },
   };
 
   const handleOpenEdit = (user) => {
     setCurrentUser(user);
-    setFile(null);
     clearPreview();
+    setFile(null);
     setOpenModal(true);
   };
 
   const handleSaveAvatar = async () => {
-    if (!currentUser) return;
-    if (!file) {
-      message.warning("Vui lòng chọn một ảnh");
-      return;
-    }
+    if (!file) return message.warning("Vui lòng chọn ảnh");
 
     try {
       setUploading(true);
-      const formData = new FormData();
-      formData.append("avatar", file);
-
       const res = await updateUserAvatar(currentUser.id, file);
-
-      if (res && res.success === true) {
-        message.success("Cập nhật ảnh đại diện thành công");
+      if (res && res.success) {
+        toast.success("Cập nhật ảnh thành công");
         setOpenModal(false);
-        setCurrentUser(null);
-        setFile(null);
-        clearPreview();
         fetchData();
       } else {
-        message.error("Cập nhật ảnh đại diện thất bại");
+        toast.error("Cập nhật thất bại vui long thử lại");
       }
-    } catch (err) {
-      console.error(err);
-      message.error("Cập nhật ảnh đại diện thất bại");
+    } catch {
+      toast.error("Lỗi khi tải ảnh lên");
     } finally {
       setUploading(false);
     }
   };
 
-  // Lọc giống UserManager
   const filteredData = useMemo(() => {
     if (!searchText.trim()) return dataUser;
     const lower = searchText.toLowerCase();
     return dataUser.filter(
       (u) =>
-        String(u.id).includes(lower) ||
         u.userFullname?.toLowerCase().includes(lower) ||
         u.userEmail?.toLowerCase().includes(lower) ||
-        u.userPhone?.toLowerCase().includes(lower)
+        u.userPhone?.toLowerCase().includes(lower) ||
+        String(u.id).includes(lower)
     );
   }, [dataUser, searchText]);
 
   const columns = [
     {
-      title: "",
+      title: "Avatar",
       dataIndex: "avatarUrl",
-      key: "avatarUrl",
-      width: 70,
-      search: false,
+      width: 80,
       render: (_, record) => (
-        <Image
-          src={record.avatarUrl ? record.avatarUrl : avtDefault}
-          alt="Avatar"
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: "50%",
-            objectFit: "cover",
-          }}
-          preview={false}
-        />
+        <Avatar size={48} src={record.avatarUrl || avtDefault} />
       ),
     },
     {
       title: "Tên người dùng",
       dataIndex: "userFullname",
-      key: "userFullname",
       width: 220,
-      render: (text, record) => (
-        <span>
-          <PictureOutlined style={{ marginRight: 8, color: "#1677ff" }} />
-          <span style={{ fontWeight: 500 }}>{text}</span>
-          <div style={{ fontSize: 12, color: "#888" }}>{record.userEmail}</div>
-        </span>
-      ),
+      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
+    },
+    {
+      title: "Email",
+      dataIndex: "userEmail",
+      width: 220,
     },
     {
       title: "Số điện thoại",
       dataIndex: "userPhone",
-      key: "userPhone",
       width: 140,
     },
     {
-      title: "Mã thẻ BHYT",
-      dataIndex: "cardNumber",
-      key: "cardNumber",
-      width: 160,
+      title: "Ảnh đại diện",
+      dataIndex: "avatarUrl",
+      width: 140,
+      render: (url) =>
+        url ? (
+          <Tag color="blue">Đã cập nhật</Tag>
+        ) : (
+          <Tag color="default">Chưa có</Tag>
+        ),
     },
     {
       title: "Thao tác",
-      key: "action",
-      width: 140,
+      width: 120,
       render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => handleOpenEdit(record)}
-          >
-            Sửa ảnh
-          </Button>
-        </Space>
+        <Button
+          type="link"
+          size="small"
+          icon={<EditOutlined />}
+          onClick={() => handleOpenEdit(record)}
+        >
+          Sửa ảnh
+        </Button>
       ),
     },
   ];
 
   return (
     <div>
-      {/* Header giống UserManager */}
       <div style={{ marginBottom: 16 }}>
         <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>
           Quản lý ảnh đại diện
         </h2>
         <p style={{ margin: "8px 0 0 0", color: "#666" }}>
-          Xem và cập nhật ảnh đại diện cho người dùng.
+          Danh sách người dùng và trạng thái ảnh đại diện
         </p>
       </div>
 
-      {/* Ô tìm kiếm giống UserManager */}
+      {/* Ô tìm kiếm */}
       <Input
-        placeholder="Tìm theo tên, email, số điện thoại..."
+        placeholder="Tìm theo tên, email hoặc số điện thoại..."
         prefix={<SearchOutlined />}
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
@@ -221,89 +179,96 @@ const ManagerAvt = () => {
         columns={columns}
         dataSource={filteredData}
         rowKey="id"
-        loading={loading}
         pagination={{
-          pageSize: 5,
+          pageSize: 6,
           showSizeChanger: true,
-          showQuickJumper: true,
         }}
-        headerTitle="Danh sách ảnh đại diện"
         search={false}
-        toolBarRender={false} // không cần nút Thêm ở đây
-        scroll={{ x: 800 }}
+        headerTitle="Danh sách người dùng"
         size="middle"
+        scroll={{ x: 900 }}
+        toolBarRender={false}
       />
 
+      {/* Modal sửa ảnh */}
       <Modal
         title={
-          currentUser
-            ? `Cập nhật ảnh cho: ${currentUser.userFullname}`
-            : "Cập nhật ảnh đại diện"
+          <div style={{ fontSize: 20, fontWeight: 600, paddingBottom: 8 }}>
+            {currentUser
+              ? `Cập nhật ảnh cho: ${currentUser.userFullname}`
+              : "Cập nhật ảnh"}
+          </div>
         }
         open={openModal}
-        onCancel={() => {
-          setOpenModal(false);
-          setCurrentUser(null);
-          setFile(null);
-          clearPreview();
-        }}
+        onCancel={() => setOpenModal(false)}
         onOk={handleSaveAvatar}
-        okText="Lưu"
         confirmLoading={uploading}
-        destroyOnClose
-        width={640}
+        okText="Lưu ảnh"
+        width={600}
+        centered
+        style={{ top: 20 }}
       >
         {currentUser && (
-          <>
+          <div style={{ padding: "10px 5px" }}>
+            {/* --- Avatar Section --- */}
             <div
               style={{
                 display: "flex",
-                gap: 24,
+                justifyContent: "space-between",
                 marginBottom: 24,
-                justifyContent: "center",
+                padding: 20,
+                background: "#fafafa",
+                borderRadius: 12,
+                boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
               }}
             >
-              <div style={{ textAlign: "center" }}>
-                <div style={{ fontWeight: 500, marginBottom: 8 }}>
+              <div style={{ textAlign: "center", flex: 1 }}>
+                <div style={{ marginBottom: 10, fontWeight: 500 }}>
                   Ảnh hiện tại
                 </div>
-                <Avatar size={96} src={currentUser.avatarUrl}>
-                  {currentUser.userFullname?.[0]?.toUpperCase()}
-                </Avatar>
+                <Avatar
+                  size={120}
+                  src={currentUser.avatarUrl || avtDefault}
+                  style={{ border: "2px solid #d9d9d9" }}
+                />
               </div>
 
-              <div style={{ textAlign: "center" }}>
-                <div style={{ fontWeight: 500, marginBottom: 8 }}>
-                  Ảnh mới (preview)
-                </div>
+              <div style={{ textAlign: "center", flex: 1 }}>
+                <div style={{ marginBottom: 10, fontWeight: 500 }}>Ảnh mới</div>
                 <Avatar
-                  size={96}
-                  src={
-                    previewUrl
-                      ? previewUrl
-                      : currentUser.avatarUrl
-                      ? currentUser.avatarUrl
-                      : avtDefault
-                  }
-                >
-                  {currentUser.userFullname?.[0]?.toUpperCase()}
-                </Avatar>
+                  size={120}
+                  src={previewUrl || currentUser.avatarUrl || avtDefault}
+                  style={{
+                    border: "2px solid #1677ff",
+                    boxShadow: previewUrl
+                      ? "0 0 10px rgba(22,119,255,0.4)"
+                      : "none",
+                  }}
+                />
               </div>
             </div>
 
-            <div style={{ marginBottom: 8, fontWeight: 500 }}>Chọn ảnh mới</div>
-            <Dragger {...uploadProps} style={{ padding: 12 }}>
-              <p className="ant-upload-drag-icon">
-                <UploadOutlined />
+            {/* --- Upload Box --- */}
+            <Dragger
+              {...uploadProps}
+              style={{
+                borderRadius: 12,
+                padding: 25,
+                background: "#fff",
+                border: "1.5px dashed #bfbfbf",
+              }}
+            >
+              <p className="ant-upload-drag-icon" style={{ marginBottom: 8 }}>
+                <UploadOutlined style={{ fontSize: 30, color: "#1677ff" }} />
               </p>
-              <p className="ant-upload-text">
-                Kéo thả ảnh vào đây hoặc bấm để chọn file
+              <p style={{ fontSize: 16, fontWeight: 500 }}>
+                Kéo ảnh vào hoặc nhấn để chọn file
               </p>
-              <p className="ant-upload-hint">
-                Nên dùng ảnh vuông, dung lượng nhỏ để tải nhanh hơn.
+              <p style={{ color: "#888" }}>
+                Hỗ trợ các định dạng ảnh (PNG, JPG…)
               </p>
             </Dragger>
-          </>
+          </div>
         )}
       </Modal>
     </div>

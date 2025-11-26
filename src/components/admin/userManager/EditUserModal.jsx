@@ -59,7 +59,6 @@ const EditUserModal = ({
         userFullname: values.userFullname.trim(),
         userEmail: values.userEmail.trim(),
         userPhone: values.userPhone.trim(),
-        userRole: values.userRole,
         bhxhNumber: values.bhxhNumber?.trim() || "",
         citizenId: values.citizenId?.trim() || "",
         dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD") || null,
@@ -75,7 +74,7 @@ const EditUserModal = ({
 
       const res = await updateuser(updatedUser);
 
-      if (res) {
+      if (res && res.success === true) {
         toast.success("✅ Cập nhật người dùng thành công!");
         fectData();
         onConfirm?.();
@@ -153,18 +152,6 @@ const EditUserModal = ({
             style={{ marginBottom: 4 }}
           >
             <Input placeholder="VD: 0905123456" />
-          </Form.Item>
-
-          <Form.Item
-            name="userRole"
-            label="Vai trò"
-            rules={[{ required: true, message: "Chọn vai trò" }]}
-            style={{ marginBottom: 4 }}
-          >
-            <Select placeholder="Chọn vai trò">
-              <Option value="admin">Quản trị viên</Option>
-              <Option value="user">Người dùng</Option>
-            </Select>
           </Form.Item>
         </div>
 
