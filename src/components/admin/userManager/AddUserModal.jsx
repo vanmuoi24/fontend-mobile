@@ -39,12 +39,13 @@ const AddUserModal = ({ visible, onCancel, onSuccess }) => {
         toast.error("Lỗi khi thêm người dùng, vui lòng thử lại!");
       }
     } catch (error) {
-      // Nếu lỗi đến từ validate form của AntD
       if (error?.errorFields) {
         toast.error("Vui lòng điền đầy đủ thông tin!");
       } else {
         console.error("❌ Lỗi khác:", error);
-        toast.error("Đã xảy ra lỗi không mong muốn!");
+        toast.error(
+          "Đã xảy ra lỗi hoặc người dùng đã tồn tại vui lòng thêm lại"
+        );
       }
     }
   };

@@ -43,8 +43,6 @@ const AddParticipationModal = ({ visible, onCancel, onSuccess }) => {
         currency: values.currency,
         salary: values.salary,
         insuranceSalary: values.insuranceSalary,
-        totalTime: values.totalTime,
-        delayedTime: values.delayedTime,
       };
 
       const res = await createParticipation(payload);
@@ -55,7 +53,7 @@ const AddParticipationModal = ({ visible, onCancel, onSuccess }) => {
       }
     } catch (err) {
       console.error("Lỗi khi thêm participation:", err);
-      message.error("Không thể thêm mới!");
+      message.error("Không thể thêm mới !");
     }
   };
 
@@ -115,9 +113,6 @@ const AddParticipationModal = ({ visible, onCancel, onSuccess }) => {
             >
               <Select placeholder="Chọn loại bảo hiểm">
                 <Option value="BHXH">BHXH</Option>
-                <Option value="BHTN">BHTN</Option>
-                <Option value="BHYT">BHYT</Option>
-                <Option value="BHTNLD_BNN">BHTNLD_BNN</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -186,19 +181,6 @@ const AddParticipationModal = ({ visible, onCancel, onSuccess }) => {
         </Row>
 
         {/* 📅 Tổng thời gian tham gia */}
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Tổng thời gian tham gia (tháng)" name="totalTime">
-              <InputNumber style={{ width: "100%" }} placeholder="VD: 24" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item label="Thời gian chậm đóng (tháng)" name="delayedTime">
-              <InputNumber style={{ width: "100%" }} placeholder="VD: 2" />
-            </Form.Item>
-          </Col>
-        </Row>
       </Form>
     </Modal>
   );

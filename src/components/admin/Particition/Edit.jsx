@@ -137,7 +137,6 @@ const EditParticipationModal = ({
               </Select>
             </Form.Item>
           </Col>
-
           <Col span={12}>
             <Form.Item
               label="Loại bảo hiểm"
@@ -148,9 +147,6 @@ const EditParticipationModal = ({
             >
               <Select placeholder="Chọn loại bảo hiểm">
                 <Option value="BHXH">BHXH</Option>
-                <Option value="BHTN">BHTN</Option>
-                <Option value="BHYT">BHYT</Option>
-                <Option value="BHTNLD_BNN">BHTNLD_BNN</Option>
               </Select>
             </Form.Item>
           </Col>
