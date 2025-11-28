@@ -14,7 +14,6 @@ const AddUserModal = ({ visible, onCancel, onSuccess }) => {
 
       const newUser = {
         userFullname: values.userFullname,
-        userEmail: values.userEmail,
         userPhone: values.userPhone,
         userPassword: values.userPassword,
         userRole: values.userRole,
@@ -89,18 +88,6 @@ const AddUserModal = ({ visible, onCancel, onSuccess }) => {
             style={{ marginBottom: 4 }}
           >
             <Input placeholder="VD: Nguyễn Văn A" />
-          </Form.Item>
-
-          <Form.Item
-            name="userEmail"
-            label="Email"
-            rules={[
-              { required: true, message: "Nhập email" },
-              { type: "email", message: "Email không hợp lệ" },
-            ]}
-            style={{ marginBottom: 4 }}
-          >
-            <Input placeholder="example@gmail.com" />
           </Form.Item>
 
           <Form.Item
