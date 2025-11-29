@@ -25,6 +25,7 @@ const EditParticipationModal = ({
 }) => {
   const [form] = Form.useForm();
   const [dataUser, setDataUser] = useState();
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchData = async () => {
     let res = await userlist();
@@ -63,7 +64,9 @@ const EditParticipationModal = ({
   }, [visible, editingRecord, form]);
 
   const handleOk = async () => {
+    if (submitting) return;
     try {
+      setSubmitting(true);
       const values = await form.validateFields();
       const payload = {
         userId: values.userId,
@@ -90,6 +93,8 @@ const EditParticipationModal = ({
     } catch (err) {
       console.error("Lỗi khi cập nhật participation:", err);
       message.error("Không thể cập nhật!");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -102,6 +107,8 @@ const EditParticipationModal = ({
         form.resetFields();
         onCancel();
       }}
+      confirmLoading={submitting}
+      cancelButtonProps={{ disabled: submitting }}
       okText="Lưu thay đổi"
       cancelText="Hủy"
       width={800}

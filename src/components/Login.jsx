@@ -111,9 +111,6 @@ const Login = () => {
         }}
       >
         <Text>Chưa có tài khoản? </Text>
-        <Link to="/register" style={{ color: "#1677ff", fontWeight: 500 }}>
-          Đăng ký
-        </Link>
       </div>
     </div>
   );

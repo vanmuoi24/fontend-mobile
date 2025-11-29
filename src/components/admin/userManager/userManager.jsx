@@ -19,11 +19,17 @@ const UserManager = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [dataUser, setDataUser] = useState();
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const fechData = async () => {
-    let res = await userlist();
-    if (res && res.data) {
-      setDataUser(res.data);
+    try {
+      setLoading(true);
+      let res = await userlist();
+      if (res && res.data) {
+        setDataUser(res.data);
+      }
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -170,6 +176,7 @@ const UserManager = () => {
         columns={columns}
         dataSource={filteredData}
         rowKey="id"
+        loading={loading}
         pagination={{
           pageSize: 5,
           showSizeChanger: true,

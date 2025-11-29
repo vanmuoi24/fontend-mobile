@@ -18,6 +18,7 @@ const { Option } = Select;
 const AddParticipationModal = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const [dataUser, setDataUser] = useState();
+  const [submitting, setSubmitting] = useState(false);
 
   const fechData = async () => {
     let res = await userlist();
@@ -30,7 +31,9 @@ const AddParticipationModal = ({ visible, onCancel, onSuccess }) => {
     fechData();
   }, []);
   const handleOk = async () => {
+    if (submitting) return;
     try {
+      setSubmitting(true);
       const values = await form.validateFields();
       const payload = {
         userId: values.userId,
@@ -54,6 +57,8 @@ const AddParticipationModal = ({ visible, onCancel, onSuccess }) => {
     } catch (err) {
       console.error("Lỗi khi thêm participation:", err);
       message.error("Không thể thêm mới !");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -66,6 +71,8 @@ const AddParticipationModal = ({ visible, onCancel, onSuccess }) => {
         form.resetFields();
         onCancel();
       }}
+      confirmLoading={submitting}
+      cancelButtonProps={{ disabled: submitting }}
       okText="Thêm mới"
       cancelText="Hủy"
       width={800}

@@ -29,13 +29,17 @@ const ManagerAvt = () => {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       let res = await userlist();
       if (res && res.data) setDataUser(res.data);
     } catch {
       message.error("Không thể tải danh sách người dùng");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -179,6 +183,7 @@ const ManagerAvt = () => {
         columns={columns}
         dataSource={filteredData}
         rowKey="id"
+        loading={loading}
         pagination={{
           pageSize: 6,
           showSizeChanger: true,
