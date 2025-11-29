@@ -96,7 +96,7 @@ const ManagerAvt = () => {
     return dataUser.filter(
       (u) =>
         u.userFullname?.toLowerCase().includes(lower) ||
-        u.userEmail?.toLowerCase().includes(lower) ||
+        u.bhxhNumber?.toLowerCase().includes(lower) ||
         u.userPhone?.toLowerCase().includes(lower) ||
         String(u.id).includes(lower)
     );
@@ -118,8 +118,8 @@ const ManagerAvt = () => {
       render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
     },
     {
-      title: "Email",
-      dataIndex: "userEmail",
+      title: "Mã BHXH",
+      dataIndex: "bhxhNumber",
       width: 220,
     },
     {

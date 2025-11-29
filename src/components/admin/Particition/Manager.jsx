@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ProTable } from "@ant-design/pro-components";
-import { Button, Tag, message, Space, Popconfirm } from "antd";
+import { Button, Tag, message, Space, Popconfirm, Input } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { getAll } from "../../../service/ChartAPI";
 import EditParticipationModal from "./Edit";
@@ -11,6 +11,19 @@ const ParticipationManager = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [debouncedSearchText, setDebouncedSearchText] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchText(searchText.trim());
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchText]);
+
+  useEffect(() => {
+    actionRef.current?.reload();
+  }, [debouncedSearchText]);
   const columns = [
     { title: "ID", dataIndex: "id", key: "id", width: 70, align: "center" },
     {
@@ -65,18 +78,7 @@ const ParticipationManager = () => {
       render: (value) => (value ? value.toLocaleString("vi-VN") : "—"),
       align: "right",
     },
-    {
-      title: "Tổng TG tham gia (tháng)",
-      dataIndex: "totalTime",
-      key: "totalTime",
-      align: "center",
-    },
-    {
-      title: "TG chậm đóng (tháng)",
-      dataIndex: "delayedTime",
-      key: "delayedTime",
-      align: "center",
-    },
+
     {
       title: "Thao tác",
       key: "action",
@@ -125,13 +127,23 @@ const ParticipationManager = () => {
           </p>
         </div>
 
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsModalVisible(true)}
-        >
-          Thêm mới
-        </Button>
+        <Space size="middle">
+          <Input.Search
+            allowClear
+            placeholder="Tìm theo họ tên, loại BH, đơn vị, địa chỉ, chức vụ..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onSearch={() => actionRef.current?.reload()}
+            style={{ width: 360 }}
+          />
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setIsModalVisible(true)}
+          >
+            Thêm mới
+          </Button>
+        </Space>
       </div>
 
       <ProTable
@@ -145,13 +157,43 @@ const ParticipationManager = () => {
           // params.pageSize: số item/trang
           try {
             const res = await getAll(); // API có thể nhận params.page, params.pageSize nếu backend hỗ trợ
-            if (res?.data) {
-              return {
-                data: res.data,
-                success: true,
-                total: res.data.length,
-              };
-            }
+            if (!res?.data) return { data: [], success: false, total: 0 };
+
+            const keyword = debouncedSearchText.toLowerCase();
+            const filtered = keyword
+              ? res.data.filter((item) => {
+                  const fullname = item.user?.userFullname || "";
+                  const insuranceType = item.insuranceType || "";
+                  const companyName = item.companyName || "";
+                  const workplaceAddress = item.workplaceAddress || "";
+                  const position = item.position || "";
+                  const idStr = String(item.id ?? "");
+
+                  const haystack = [
+                    fullname,
+                    insuranceType,
+                    companyName,
+                    workplaceAddress,
+                    position,
+                    idStr,
+                  ]
+                    .join(" ")
+                    .toLowerCase();
+
+                  return haystack.includes(keyword);
+                })
+              : res.data;
+
+            const current = Number(params?.current || 1);
+            const pageSize = Number(params?.pageSize || 6);
+            const startIndex = (current - 1) * pageSize;
+            const pageData = filtered.slice(startIndex, startIndex + pageSize);
+
+            return {
+              data: pageData,
+              success: true,
+              total: filtered.length,
+            };
           } catch (err) {
             message.error("Không thể tải dữ liệu!");
             return { data: [], success: false, total: 0 };
