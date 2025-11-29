@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
 import { toast } from "react-toastify";
 import { updateuser } from "../../../service/UserApi";
@@ -14,6 +14,7 @@ const EditUserModal = ({
   fectData,
 }) => {
   const [form] = Form.useForm();
+  const [submitting, setSubmitting] = useState(false);
 
   // ✅ Cập nhật form khi mở modal
   useEffect(() => {
@@ -47,7 +48,9 @@ const EditUserModal = ({
   }, [userData, visible, form]);
 
   const handleOk = async () => {
+    if (submitting) return;
     try {
+      setSubmitting(true);
       // ✅ Validate form
       const values = await form.validateFields({
         scroll: { scrollToFirstError: true },
@@ -87,6 +90,8 @@ const EditUserModal = ({
         console.error("❌ Lỗi khi cập nhật:", error);
         toast.error("Đã xảy ra lỗi không mong muốn!");
       }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -99,6 +104,8 @@ const EditUserModal = ({
         form.resetFields();
         onCancel();
       }}
+      confirmLoading={submitting}
+      cancelButtonProps={{ disabled: submitting }}
       okText="Lưu thay đổi"
       cancelText="Hủy"
       width={1020}

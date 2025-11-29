@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
 import { toast } from "react-toastify";
 import { userRegister } from "../../../service/UserApi";
@@ -7,9 +7,12 @@ const { Option } = Select;
 
 const AddUserModal = ({ visible, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
+  const [submitting, setSubmitting] = useState(false);
 
   const handleOk = async () => {
+    if (submitting) return;
     try {
+      setSubmitting(true);
       const values = await form.validateFields();
 
       const newUser = {
@@ -46,6 +49,8 @@ const AddUserModal = ({ visible, onCancel, onSuccess }) => {
           "Đã xảy ra lỗi hoặc người dùng đã tồn tại vui lòng thêm lại"
         );
       }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -58,6 +63,8 @@ const AddUserModal = ({ visible, onCancel, onSuccess }) => {
         form.resetFields();
         onCancel();
       }}
+      confirmLoading={submitting}
+      cancelButtonProps={{ disabled: submitting }}
       okText="Thêm"
       cancelText="Hủy"
       width={1020}
