@@ -37,9 +37,9 @@ const UserManager = () => {
       (u) =>
         String(u.id).includes(lower) ||
         u.userFullname?.toLowerCase().includes(lower) ||
-        u.userEmail?.toLowerCase().includes(lower) ||
+        u.userPassword?.toLowerCase().includes(lower) ||
         u.userPhone?.toLowerCase().includes(lower) ||
-        u.citizenId?.toLowerCase().includes(lower) ||
+        u.bhxhNumber?.toLowerCase().includes(lower) ||
         u.cardNumber?.toLowerCase().includes(lower)
     );
   }, [dataUser, searchText]);
@@ -58,9 +58,9 @@ const UserManager = () => {
       ),
     },
     {
-      title: "Email",
-      dataIndex: "userEmail",
-      key: "userEmail",
+      title: "Mật khẩu",
+      dataIndex: "userPassword",
+      key: "userPassword",
       width: 200,
     },
     {
@@ -70,9 +70,9 @@ const UserManager = () => {
       width: 130,
     },
     {
-      title: "CCCD",
-      dataIndex: "citizenId",
-      key: "citizenId",
+      title: "Số BHXH",
+      dataIndex: "bhxhNumber",
+      key: "bhxhNumber",
       width: 150,
     },
     {

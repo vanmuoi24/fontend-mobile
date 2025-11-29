@@ -22,7 +22,6 @@ const EditUserModal = ({
       setTimeout(() => {
         form.setFieldsValue({
           userFullname: userData.userFullname || "",
-          userEmail: userData.userEmail || "",
           userPhone: userData.userPhone || "",
           userRole: userData.userRole || "",
           bhxhNumber: userData.bhxhNumber || "",
@@ -57,7 +56,6 @@ const EditUserModal = ({
       const updatedUser = {
         id: userData.id,
         userFullname: values.userFullname.trim(),
-        userEmail: values.userEmail.trim(),
         userPhone: values.userPhone.trim(),
         bhxhNumber: values.bhxhNumber?.trim() || "",
         citizenId: values.citizenId?.trim() || "",
@@ -131,18 +129,6 @@ const EditUserModal = ({
             style={{ marginBottom: 4 }}
           >
             <Input placeholder="VD: Nguyễn Văn A" />
-          </Form.Item>
-
-          <Form.Item
-            name="userEmail"
-            label="Email"
-            rules={[
-              { required: true, message: "Nhập email" },
-              { type: "email", message: "Email không hợp lệ" },
-            ]}
-            style={{ marginBottom: 4 }}
-          >
-            <Input placeholder="example@gmail.com" />
           </Form.Item>
 
           <Form.Item
