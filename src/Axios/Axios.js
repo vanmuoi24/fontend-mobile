@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://159.223.58.164:8080/api/v1",
+  baseURL: "https://api.bhyt.online/api/v1",
   withCredentials: true,
 });
 
