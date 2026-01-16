@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { ProTable } from "@ant-design/pro-components";
 import { Button, Tag, message, Space, Popconfirm, Input } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { getAll } from "../../../service/ChartAPI";
+import { deleteParticipation, getAll } from "../../../service/ChartAPI";
 import EditParticipationModal from "./Edit";
 import AddParticipationModal from "./Add";
+import { toast } from "react-toastify";
 
 const ParticipationManager = () => {
   const actionRef = useRef();
@@ -95,7 +96,7 @@ const ParticipationManager = () => {
           </Button>
           <Popconfirm
             title="Bạn có chắc muốn xóa quá trình tham gia bảo hiểm này?"
-            // onConfirm={}
+            onConfirm={() => handleDelete(record)}
             okText="Xóa"
             cancelText="Hủy"
           >
@@ -108,6 +109,19 @@ const ParticipationManager = () => {
     },
   ];
 
+  const handleDelete = async (record) => {
+    try {
+      let res = await deleteParticipation(record.id);
+      if (res.success === true) {
+        toast.success("Xóa quá trình tham gia bảo hiểm thành công!");
+        actionRef.current?.reload();
+      } else {
+        toast.error("Không thể xóa quá trình tham gia bảo hiểm này!");
+      }
+    } catch {
+      toast.error("Không thể xóa quá trình tham gia bảo hiểm này!");
+    }
+  };
   return (
     <div>
       <div

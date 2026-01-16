@@ -19,10 +19,16 @@ const createParticipation = (data) => {
 const updateParticipation = (id, data) => {
   return instance.put(`participations/${id}`, data);
 };
+
+const deleteParticipation = (id) => {
+  return instance.delete(`participations/${id}`);
+};
+
 export {
   getAll,
   getChartById,
   updateUser,
   createParticipation,
   updateParticipation,
+  deleteParticipation,
 };
